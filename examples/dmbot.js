@@ -40,6 +40,33 @@ controller.hears(['who are you', 'what are you'],['direct_message','direct_menti
 	});
 });
 
+
+controller.hears(['room'],['direct_message','direct_mention','mention'],function(bot,message) {
+	bot.startConversation(message, function(err, convo)
+	{			
+		convo.ask(room.description, function(response, convo)
+		{	
+			trigger = response.text;
+			roomResponse(room, trigger, convo);
+			convo.next();
+		});
+	});
+});
+
+var json = '{"id":1,"description":"Thick *cobwebs* fill the corners of the room, and wisps of webbing hang from the ceiling and waver in a *wind* you can barely feel. One corner of the ceiling has a particularly large clot of webbing within which a goblin\'s *bones* are tangled. _What do you do?_","prompts":[{"trigger":"cobwebs","response":"As you approach the the tangle of webs, writhing egg sacks burst open and a swarm of spiders spills out before. They are hungry for their first meal and heading your way. Prepare for *combat*."},{"trigger":"wind","response":"The wind is hard to trace, but it reveals a small crack in the stone wall. Peering through, you can barely make out the flickering light of a camp fire in the large, adjacent room."},{"trigger":"bones","response":"The goblin corpse has a few rusty weapons, crude armor and a few gold coins. _You looted 4 *gold*._"}]}'
+var room = JSON.parse(json);
+
+var roomResponse = function(room, trigger, convo)
+{
+	for(i = 0; i < room.prompts.length; i++)
+	{
+			if(trigger == room.prompts[i].trigger)
+			{
+				convo.say(room.prompts[i].response);
+			}
+	}
+}
+
 var randomJoke = function()
 {
 	var r = Math.floor(Math.random() * 6);
