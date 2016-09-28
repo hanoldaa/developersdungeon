@@ -23,7 +23,7 @@ controller.hears(['create'],['direct_message'],function(bot,message)
 {
 	var name = '';
 	var race = '';
-	var clas = '';
+	var prof = '';
 
 	bot.startConversation(message,function(err,convo) 
 	{
@@ -36,7 +36,7 @@ controller.hears(['create'],['direct_message'],function(bot,message)
 	        pattern: bot.utterances.yes,
 	        callback: function(response,convo) 
 	        {
-	          convo.say('Great! Let\'s start with the basics.');
+	          convo.say('We shall see if you have what it takes. Let\'s start with the basics.');
 	          askName(response, convo);
 	          convo.next();
 	        }
@@ -90,14 +90,15 @@ controller.hears(['create'],['direct_message'],function(bot,message)
 
 	var askRace = function(response, convo)
 	{
-		convo.ask('What is your race, ' + name + '? (human, dwarf, elf)', 
+		convo.ask('What race is ' + name + '? (human, dwarf, elf)', 
 		[
 			{
 				pattern: 'human',
 				callback: function(response, convo)
 				{
-					race = 'human';
+					race = 'Human';
 					convo.say("A noble choice.");
+					askClass(response, convo);
 					convo.next();
 				}
 			},
@@ -105,8 +106,9 @@ controller.hears(['create'],['direct_message'],function(bot,message)
 				pattern: 'dwarf',
 				callback: function(response, convo)
 				{
-					race = 'dwarf';
+					race = 'Dwarf';
 					convo.say("Dwarves, as strong as they are stubborn.");
+					askClass(response, convo);
 					convo.next();
 				}
 			},
@@ -114,8 +116,9 @@ controller.hears(['create'],['direct_message'],function(bot,message)
 				pattern: 'elf',
 				callback: function(response, convo)
 				{
-					race = 'elf';
-					convo.say("Ancient and wise beings, elves.")
+					race = 'Elf';
+					convo.say("Ancient and wise beings, elves.");
+					askClass(response, convo);
 					convo.next();
 				}
 			},
@@ -129,6 +132,109 @@ controller.hears(['create'],['direct_message'],function(bot,message)
 				}
 			}
 		]);
+	}
+
+	var askClass = function(response, convo)
+	{
+		convo.ask('And what kind of hero is ' + name + ' the ' + race + '? (deathomancer [dm], muscle mage [mm], doom knight [dk], bruhzerker [bz])', 
+		[
+			{
+				pattern: 'deathomancer|dm',
+				callback: function(response, convo)
+				{
+					var descr = "You want so desperately to be edgy. I get it. I _really_ do. ";
+					descr += "Deathomancers are masters of everything death, obviously. ";
+					descr += "Summoning the dead, shooting death from their wand, speaking to the dead. "
+					descr += "If that doesn't spell 'edge', then I don't know what does."
+					
+					confirmClass(convo, descr, "Deathomancer");
+					convo.next();
+				}
+			},
+			{
+				pattern: 'muscle mage|mm',
+				callback: function(response, convo)
+				{
+					var descr = "WHAT'S BETTER THAN A FIREBALL SLUGGING MAGE IN SICK ASS, FLOWY ROBES!? ";
+					descr += "THAT'S RIGHT! A FIREBALL SLUGGING MAGE IN SICK ASS, FLOWY ROBES THAT ARE ";
+					descr += "TOO TIGHT FOR HIS OR HER RIPPLING MUSCLES BECAUSE HE OR SHE IS FUELED BY THE ";
+					descr += "RAW AND PRIMAL POWER OF WHEY PROTEIN!";
+					
+					confirmClass(convo, descr, "Muscle Mage");
+					convo.next();
+				}
+			},
+			{
+				pattern: 'doom knight|dk',
+				callback: function(response, convo)
+				{
+					var descr = "_Repent! The end is ni!_ Doom Knights are the rare and chosen ";
+					descr += "few who spread the word of the inevitable end of all things. ";
+					descr += "Chosen by whome? Well, no one really knows. Probably some psycopath ";
+					descr += "who thinks arming powerful brainwashed zealots makes for a fun hump-day ";
+					descr += "evening.";
+
+					confirmClass(convo, descr, "Doom Knight");
+					convo.next();
+				}
+			},
+			{
+				pattern: 'bruhzerker|bz',
+				callback: function(response, convo)
+				{
+					var descr = "You're the kind of person who says worlds like 'bruh' to mean 'bro', ";
+					descr += "and get all cocky and puffy-chested when around other Bruhzerkers. ";
+					descr += "You are obviously compensating for something with the massive weapon ";
+					descr += "you use to cleave hordes of evil. You are fueled by lite ale rather than ";
+					descr += "rage and exert your dominance by storing dip-spit for the ultimate hock.";
+
+					confirmClass(convo, descr, "Bruhzerker");
+					convo.next();
+				}	
+			},
+			{
+				default: true,
+				callback: function(response, convo)
+				{
+					convo.say('Can\'t you do anything right? Try again!');
+					askClass(response, convo);
+					convo.next();
+				}
+			}
+		]);
+
+		var confirmClass = function(convo, descr, className)
+		{
+			convo.say(descr);
+			convo.ask('Does this sound like ' + name + '?',
+			[
+			  	{
+			        pattern: bot.utterances.yes,
+			        callback: function(response,convo) 
+			        {
+			        	prof = className;
+			        	convo.say('That is all for now...');
+			          	convo.next();
+			        }
+			  	},
+			  	{
+			        pattern: bot.utterances.no,
+			        callback: function(response,convo) 
+			        {
+			          	askClass(response, convo);
+			          	convo.next();
+			        }
+			  	},
+			  	{
+			        default: true,
+			        callback: function(response,convo) 
+			        {
+			          confirmClass(convo, descr, className);
+			          convo.next();
+			        }
+			  	}
+		  	]);
+		}
 	}
 });	
 
