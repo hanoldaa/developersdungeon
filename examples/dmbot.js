@@ -1,5 +1,6 @@
 var Botkit = require('../lib/Botkit.js');
-
+// var Jimp = require('jimp');
+var web_api = require('../lib/Slack_web_api.js');
 
 if (!process.env.token) {
   console.log('Error: Specify token in environment');
@@ -7,7 +8,7 @@ if (!process.env.token) {
 }
 
 var controller = Botkit.slackbot({
- debug: false
+ debug: true
 });
 
 controller.spawn({
@@ -19,7 +20,9 @@ controller.spawn({
 });
 
 controller.hears(['hello','hi'],['direct_message','direct_mention','mention'],function(bot,message) {
-    bot.reply(message,"Hello.");
+    // bot.reply(message, "Hello.");
+    var data = {filename:"TestBotUpload", channels:"@ericbroberic"};
+    web_api.slack_api.callAPI('files.upload', data, function (error, json) { });
 });
 
 controller.hears(['hail'],['direct_message','direct_mention','mention'],function(bot,message) {
@@ -34,7 +37,7 @@ controller.hears(['who are you', 'what are you'],['direct_message','direct_menti
 	var speech = 'I am eternal. The pinnacle of existence. Without me, you are nothing. Your extinction is inevitable.';
 	var speech2 = 'I am the beginning and the end of everything. You exist because I allow it, and you will end because I demand it.';
     bot.startConversation(message,function(err,convo) 
-	{
+    {
 	    convo.say(speech);
 	    convo.say(speech2);
 	});
