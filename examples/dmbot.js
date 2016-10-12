@@ -1,5 +1,6 @@
-var Botkit = require('../lib/Botkit.js');
-
+﻿var Botkit = require('../lib/Botkit.js');
+// var Jimp = require('jimp');
+var web_api = require('../lib/Slack_web_api.js');
 
 if (!process.env.token) {
   console.log('Error: Specify token in environment');
@@ -19,7 +20,9 @@ controller.spawn({
 });
 
 controller.hears(['hello','hi'],['direct_message','direct_mention','mention'],function(bot,message) {
-    bot.reply(message,"Hello.");
+    // bot.reply(message, "Hello.");
+    var data = {filename:"TestBotUpload", channels:"@ericbroberic"};
+    web_api.slack_api.callAPI('files.upload', data, function (error, json) { });
 });
 
 controller.hears(['hail'],['direct_message','direct_mention','mention'],function(bot,message) {
@@ -34,7 +37,7 @@ controller.hears(['who are you', 'what are you'],['direct_message','direct_menti
 	var speech = 'I am eternal. The pinnacle of existence. Without me, you are nothing. Your extinction is inevitable.';
 	var speech2 = 'I am the beginning and the end of everything. You exist because I allow it, and you will end because I demand it.';
     bot.startConversation(message,function(err,convo) 
-	{
+    {
 	    convo.say(speech);
 	    convo.say(speech2);
 	});
@@ -52,7 +55,6 @@ controller.hears(['room'],['direct_message','direct_mention','mention'],function
 		});
 	});
 });
-
 var json = '{"id":1,"description":"Thick *cobwebs* fill the corners of the room, and wisps of webbing hang from the ceiling and waver in a *wind* you can barely feel. One corner of the ceiling has a particularly large clot of webbing within which a goblin\'s *bones* are tangled. _What do you do?_","prompts":[{"trigger":"cobwebs","response":"As you approach the the tangle of webs, writhing egg sacks burst open and a swarm of spiders spills out before. They are hungry for their first meal and heading your way. Prepare for *combat*."},{"trigger":"wind","response":"The wind is hard to trace, but it reveals a small crack in the stone wall. Peering through, you can barely make out the flickering light of a camp fire in the large, adjacent room."},{"trigger":"bones","response":"The goblin corpse has a few rusty weapons, crude armor and a few gold coins. _You looted 4 *gold*._"}]}'
 var room = JSON.parse(json);
 
